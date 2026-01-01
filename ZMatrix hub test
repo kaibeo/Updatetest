@@ -1,0 +1,33 @@
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local RbxAnalyticsService = game:GetService("RbxAnalyticsService")
+
+local player = Players.LocalPlayer
+local hwid = RbxAnalyticsService:GetClientId()
+local key = getgenv().Key
+
+-- Gửi request verify
+local response = request({
+    Url = "https://YOUR_SERVER/verify",
+    Method = "POST",
+    Headers = {
+        ["Content-Type"] = "application/json"
+    },
+    Body = HttpService:JSONEncode({
+        key = key,
+        hwid = hwid
+    })
+})
+
+local result = HttpService:JSONDecode(response.Body)
+
+if not result.ok then
+    warn("Verify failed:", result.msg)
+
+    -- Kick user khỏi game
+    if player then
+        player:Kick("Key không hợp lệ hoặc HWID đã bị thay đổi.\nVui lòng dùng /resethwid trên Discord.")
+    end
+
+    return -- stop script
+end
