@@ -1,83 +1,72 @@
-local Library = loadstring(game:HttpGet("http://luaprov1.run.place/Matsune/uploads/Kakak.lua/d75962ea0a5aff3f48602ac29cc4cace.lua"))()
-local Main = Library.CreateMain({
-    Desc = ""
-})
+local DragonToro = loadstring(game:HttpGet("http://luaprov1.run.place/Matsune/uploads/Kakak.lua/7f8a74922db276fb9f4033ebd9d45947.lua"))()
 
-local Page = Main.CreatePage({
-    Page_Name = "Home",
-    Page_Title = "Home"
-})
+local DragonToro1 = DragonToro:DragonToroo()
 
-local Page2 = Main.CreatePage({
-    Page_Name = "Home1",
-    Page_Title = "Home2"
-})
+local Tab = DragonToro1:DragonTorooTab("TAB NAME")
 
-local Page3 = Main.CreatePage({
-    Page_Name = "Home3",
-    Page_Title = "Home4"
-})
+local Section = Tab:DragonTorooSection("SECTION NAME", "Left") 
 
+local Section1 = Tab:DragonTorooSection("SECTION NAME", "Right")
 
-local Section = Page.CreateSection("Setting")
-
-Section.CreateToggle({
-    Title = "Enable/Disable function",
-    Desc = "Here is an example toggle",
-    Default = false
-}, function(state)
+local Label = Section:DragonTorooLabel("Text Here")
+Label:Change("New Text")
+local Paragraph = Section:DragonTorooParagarp("Paragraph text here")
+local ColorLabel = Section:DragonTorooLabelColor("Colored Text", Color3.fromRGB(255, 0, 0))
+Section:DragonTorooButton("Button Name", function()
+    print("Button clicked!")
+    -- Code khi click
+end)
+local ToggleBtn = Section:DragonTorooButtonTog("Toggle Button", false, function(state)
     print("Toggle state:", state)
+    -- Code khi toggle thay đổi
 end)
 
-Section.CreateButton({
-    Title = "Click me"
-}, function()
-    print("Button has been pressed!")
+-- Thay đổi trạng thái
+ToggleBtn:Update(true) -- Bật
+ToggleBtn:Update(false) -- Tắt
+local Toggle = Section:DragonTorooToggle("Toggle Name", false, function(state)
+    print("Toggle:", state)
+    -- Code khi toggle thay đổi
 end)
 
-Section.CreateLabel({
-    Title = "Here is an example label"
-})
-
-Section.CreateSlider({
-    Title = "Adjust value",
-    Min = 0,
-    Max = 100,
-    Default = 50,
-    Precise = true
-}, function(value)
-    print("Slider value:", value)
+-- Thay đổi trạng thái
+Toggle:Update(true)
+Section:DragonTorooTextbox("Textbox Name", "Placeholder text", function(text)
+    print("Text entered:", text)
+    -- Xử lý text
 end)
+local Dropdown = Section:Dropdown("Dropdown Name", 
+    {"Option 1", "Option 2", "Option 3", "Option 4"},
+    "Option 1", -- Giá trị mặc định
+    function(selected)
+        print("Selected:", selected)
+        -- Xử lý lựa chọn
+    end
+)
 
-Section.CreateBox({
-    Title = "Enter text",
-    Placeholder = "Type something...",
-    Default = "",
-    Number = false
-}, function(text)
-    print("You have entered:", text)
-end)
+-- Thêm option mới
+Dropdown:Add("New Option")
 
-Section.CreateDropdown({
-    Title = "Dropdown",
-    List = {
-        "Option 1",
-        "Option 2",
-        "Option 3"
-    },
-    Search = false,
-    Selected = false,
-    Default = "Option 1",
-}, function(value)
-    print(value)
-end)
+-- Xóa tất cả options
+Dropdown:Clear()
+local MultiDropdown = Section:DragonTorooMultiDropdown("Multi Select",
+    {"Item 1", "Item 2", "Item 3", "Item 4"},
+    {"Item 1"}, -- Mảng giá trị mặc định
+    function(selectedArray, item)
+        print("Selected items:", table.concat(selectedArray, ", "))
+        print("Last clicked:", item)
+        -- Xử lý
+    end
+)
+local Slider = Section:DragonTorooSlider("Slider Name",
+    0,  -- Min value
+    100, -- Max value
+    50,  -- Default value
+    function(value)
+        print("Slider value:", value)
+        -- Xử lý giá trị
+    end
+)
 
-local Section1 = Page2.CreateSection("Setting 2")
-
-Section1.CreateToggle({
-    Title = "Enable/Disable function",
-    Desc = "Here is an example toggle",
-    Default = false
-}, function(state)
-    print("Toggle state:", state)
-end)
+-- Thay đổi giá trị
+Slider:Update(75)
