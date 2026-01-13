@@ -1119,7 +1119,7 @@ function Library.CreateMain(Setting)
 
 				ToggleFrame.Name = "ToggleFrame"
 				ToggleFrame.Parent = Section
-				ToggleFrame.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+				ToggleFrame.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
 				ToggleFrame.BackgroundTransparency = 1.000
 				ToggleFrame.Position = UDim2.new(0, 0, 0.300000012, 0)
 				ToggleFrame.Size = UDim2.new(1, 0 , 0, 0)
@@ -1159,7 +1159,7 @@ function Library.CreateMain(Setting)
 					cac = 0
 					ToggleDesc.Name = "ToggleDesc"
 					ToggleDesc.Parent = TogFrame1
-					ToggleDesc.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+					ToggleDesc.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
 					ToggleDesc.BackgroundTransparency = 1.000
 					ToggleDesc.Position = UDim2.new(0, 15, 0, 20)
 					ToggleDesc.Size = UDim2.new(1, -50, 0, 0)
@@ -1751,7 +1751,7 @@ end
 
 							SampleItemButton.Name = "SampleItemButton"
 							SampleItemButton.Parent = SampleItem
-							SampleItemButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+							SampleItemButton.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
 							SampleItemButton.BackgroundTransparency = 1.000
 							SampleItemButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
 							SampleItemButton.BorderSizePixel = 0
