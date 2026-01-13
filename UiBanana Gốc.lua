@@ -1377,14 +1377,14 @@ function sectionFunction.CreateButton(Setting, Callback)
 	ClickButton.MouseEnter:Connect(function()
 		game:GetService("TweenService"):Create(ClickButton, TweenInfo.new(0.2), {
 			Size = UDim2.new(0, 96, 0, 32),
-			BackgroundColor3 = Color3.fromRGB(165, 239, 35) -- Sáng hơn khi hover
+			BackgroundColor3 = Color3.fromRGB(255, 215, 0) -- Sáng hơn khi hover
 		}):Play()
 	end)
 
 	ClickButton.MouseLeave:Connect(function()
 		game:GetService("TweenService"):Create(ClickButton, TweenInfo.new(0.2), {
 			Size = UDim2.new(0, 94, 0, 30),
-			BackgroundColor3 = Color3.fromRGB(145, 219, 15) -- Màu gốc
+			BackgroundColor3 = Color3.fromRGB(255, 215, 0) -- Màu gốc
 		}):Play()
 	end)
 
