@@ -1309,7 +1309,7 @@ function sectionFunction.CreateButton(Setting, Callback)
 	ClickButton.Font = Enum.Font.GothamBold
 	ClickButton.TextSize = 13
 	ClickButton.TextColor3 = Color3.new(0, 0, 0) -- MÀU ĐEN (20,20,20 đổi thành 0,0,0 cho đen rõ)
-	ClickButton.BackgroundColor3 = Color3.fromRGB(145, 219, 15) -- Màu xanh lá
+	ClickButton.BackgroundColor3 = Color3.fromRGB(255, 215, 0) -- Gold luxury
 	ClickButton.AutoButtonColor = false
 
 	local ClickButtonCorner = Instance.new("UICorner")
@@ -1319,8 +1319,8 @@ function sectionFunction.CreateButton(Setting, Callback)
 	-- Gradient Effect - Sửa để phù hợp với màu xanh lá trong ảnh
 	local ButtonGradient = Instance.new("UIGradient")
 	ButtonGradient.Color = ColorSequence.new{
-		ColorSequenceKeypoint.new(0, Color3.fromRGB(125, 199, 5)),   -- Xanh lá đậm hơn ở trên
-		ColorSequenceKeypoint.new(1, Color3.fromRGB(145, 219, 15))   -- Xanh lá sáng hơn ở dưới
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 215, 0)),   -- Xanh lá đậm hơn ở trên
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(35, 35, 35))   -- Xanh lá sáng hơn ở dưới
 	}
 	ButtonGradient.Rotation = 90
 	ButtonGradient.Parent = ClickButton
