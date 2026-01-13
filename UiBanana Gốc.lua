@@ -27,7 +27,7 @@ local IndexUIColor = {
     ["Background Image"] = "",
 
     ["Page Selected Color"] = Color3.fromRGB(255, 215, 0),
-    ["Section Text Color"] = Color3.fromRGB(255, 215, 0),
+    ["Section Text Color"] = Color3.fromRGB(255, 255, 255),
     ["Section Underline Color"] = Color3.fromRGB(255, 215, 0),
 
     ["Toggle Border Color"] = Color3.fromRGB(255, 215, 0),
@@ -1147,7 +1147,7 @@ function Library.CreateMain(Setting)
 				check.Name = "check"
 				check.Parent = checkbox
 				check.AnchorPoint = Vector2.new(0.5, 0.5)
-				check.BackgroundColor3 = Color3.fromRGB(115, 176, 9)
+				check.BackgroundColor3 = Color3.fromRGB(255, 215, 0)
 				check.BackgroundTransparency = 0
 				check.Position = UDim2.new(0.5, 0, 0.5, 0)
 				check.Size = UDim2.new(0,0,0,0)
