@@ -10,7 +10,7 @@ local IndexUIColor = {
     ["Border Color"] = Color3.fromRGB(255, 215, 0), -- viền vàng luxury
     ["Click Effect Color"] = Color3.fromRGB(230, 230, 230),
     ["Setting Icon Color"] = Color3.fromRGB(230, 230, 230),
-    ["Logo Image"] = "rbxassetid://117663386124386",
+    ["Logo Image"] = "rbxassetid://136144254602856",
     ["Search Icon Color"] = Color3.fromRGB(255, 255, 255),
     ["Search Icon Highlight Color"] = Color3.fromRGB(255, 215, 0),
 
@@ -151,7 +151,7 @@ ToggleButton.BorderSizePixel = 0
 ToggleButton.Position = UDim2.new(0.120833337 - 0.10, 0, 0.0952890813 + 0.01, 0)
 ToggleButton.Size = UDim2.new(0, 50, 0, 50)
 ToggleButton.Draggable = true
-ToggleButton.Image = "rbxassetid://100666805146072"
+ToggleButton.Image = "rbxassetid://140608916057006"
 
 local UICorner = Instance.new("UICorner")
 UICorner.CornerRadius = UDim.new(1, 0)
@@ -252,7 +252,7 @@ local libCreateNoti = function(Setting)
 	CloseImage.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
 	CloseImage.BackgroundTransparency = 1.000
 	CloseImage.Size = UDim2.new(1, 0, 1, 0)
-	CloseImage.Image = "rbxassetid://129781592728096"
+	CloseImage.Image = "rbxassetid://140608916057006"
 	CloseImage.ImageRectOffset = Vector2.new(284, 4)
 	CloseImage.ImageRectSize = Vector2.new(24, 24)
 	CloseImage.ImageColor3 = cache.UIColor["Search Icon Color"]
@@ -364,7 +364,7 @@ function Library.CreateMain(Setting)
 	maingui.Position = UDim2.new(0.5, 0, 0.5, 0)
 	maingui.Selectable = true
 	maingui.Size = UDim2.new(1, 30, 1, 30)
-	maingui.Image = "rbxassetid://129781592728096"
+	maingui.Image = "rbxassetid://136144254602856"
 	maingui.ScaleType = Enum.ScaleType.Slice
 	maingui.SliceCenter = Rect.new(15, 15, 175, 175)
 	maingui.SliceScale = 1.300
@@ -390,7 +390,7 @@ function Library.CreateMain(Setting)
 	ustroke.Transparency = 0.8
 	cache.ReadyForGuiLoaded = true
 	local boder_ = Instance.new("ImageLabel", MainContainer)
-	boder_.Image = "rbxassetid://131407996827614"
+	boder_.Image = "rbxassetid://136144254602856"
 	boder_.BackgroundTransparency = 1
 	boder_.ImageTransparency = 0.8
 	boder_.Position = UDim2.new(0, -50,0, -80)
@@ -427,7 +427,7 @@ function Library.CreateMain(Setting)
 	Ruafimg.BackgroundTransparency = 1.000
 	Ruafimg.Position = UDim2.new(0, 5, 0, cache.T1 and 5 or 0)
 	Ruafimg.Size = UDim2.new(0, cache.T1 and 30 or 25, 0, cache.T1 and 15 or 25)
-	Ruafimg.Image = "rbxassetid://117663386124386"
+	Ruafimg.Image = "rbxassetid://136144254602856"
 
 
 	TextLabelMain.Name = "TextLabelMain"
