@@ -1,4 +1,4 @@
-_G.Color = Color3.fromRGB(255, 204, 0) 
+_G.Color = Color3.fromRGB(255, 215, 0) 
 _G.imageLogo = "rbxassetid://136144254602856"
 
 local DragonToro = {}
