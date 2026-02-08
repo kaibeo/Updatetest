@@ -2994,7 +2994,7 @@ loadstring(game:HttpGet('https://raw.githubusercontent.com/asher-realrise/projec
 wind = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Window = wind:CreateWindow({
     Title = "ZMatrix Hub | Vesion 1 - by Kaibeo ",
-    Icon = "rbxassetid://140139922076121",
+    Icon = "rbxassetid://134861505707394",
     Author = "Version: <font color=\"#FFD700\">FREEMIUM</font> | Blox Fruit",
     Folder = "bet",
     Size = UDim2.fromOffset(580, 460),
@@ -3040,7 +3040,7 @@ page2:Select()
 --
 Window:EditOpenButton({
     Title = "Click Here To Open",
-    Icon = "rbxassetid://140139922076121",
+    Icon = "rbxassetid://134861505707394",
     CornerRadius = UDim.new(1),
     StrokeThickness = 2,
     Color = ColorSequence.new(
