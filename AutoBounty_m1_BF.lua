@@ -242,18 +242,22 @@ function Funcs:Attack()
 end
 --// SETTINGS
 local RANGE_LEVEL = 300
-local DIST_BEHIND = 3
+local FOLLOW_SMOOTH = 0.25
+local DIST_BEHIND = 4
 local HEIGHT_OFFSET = 2
-local SCAN_INTERVAL = 5
 local CHECK_DAMAGE_TIME = 2
-local RESET_TIME = 30
 
 --// SERVICES
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+
 local Player = Players.LocalPlayer
 
---// STORAGE
-local UsedTargets = {}
+--// STATE
+local CurrentTarget = nil
+local LockTarget = false
 
 --// GET LEVEL
 local function GetLevel(plr)
@@ -267,22 +271,21 @@ local function GetLevel(plr)
     return 0
 end
 
---// CHECK USED
-local function IsUsed(plr)
-    return UsedTargets[plr] ~= nil
-end
+--// AUTO EQUIP FRUIT
+local function EquipFruit()
+    local char = Player.Character
+    if not char then return end
 
-local function AddUsed(plr)
-    UsedTargets[plr] = tick()
-end
-
---// RESET LIST
-task.spawn(function()
-    while true do
-        task.wait(RESET_TIME)
-        UsedTargets = {}
+    for _, tool in pairs(Player.Backpack:GetChildren()) do
+        if tool:IsA("Tool") then
+            local name = tool.Name:lower()
+            if name:find("kitsune") or name:find("rex") then
+                char.Humanoid:EquipTool(tool)
+                break
+            end
+        end
     end
-end)
+end
 
 --// GET TARGET
 local function GetTarget()
@@ -290,11 +293,7 @@ local function GetTarget()
     local valid = {}
 
     for _, plr in pairs(Players:GetPlayers()) do
-        if plr ~= Player 
-        and plr.Character 
-        and plr.Character:FindFirstChild("HumanoidRootPart")
-        and not IsUsed(plr) then
-
+        if plr ~= Player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
             local lvl = GetLevel(plr)
             if math.abs(myLevel - lvl) <= RANGE_LEVEL then
                 table.insert(valid, plr)
@@ -309,22 +308,7 @@ local function GetTarget()
     return nil
 end
 
---// TP + LOCK
-local function GoBehind(target)
-    local char = Player.Character
-    if not char then return end
-
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    local targetHRP = target.Character:FindFirstChild("HumanoidRootPart")
-
-    if not hrp or not targetHRP then return end
-
-    local pos = targetHRP.CFrame * CFrame.new(0, HEIGHT_OFFSET, DIST_BEHIND)
-    hrp.CFrame = pos
-    hrp.CFrame = CFrame.new(hrp.Position, targetHRP.Position)
-end
-
---// CHECK DAMAGE (chỉ để đổi target, không đánh)
+--// CHECK DAMAGE
 local function IsTakingDamage(target)
     local humanoid = target.Character and target.Character:FindFirstChild("Humanoid")
     if not humanoid then return false end
@@ -336,29 +320,82 @@ local function IsTakingDamage(target)
     return newHP < oldHP
 end
 
---// MAIN LOOP
+--// FOLLOW SYSTEM (NO TP)
+RunService.Heartbeat:Connect(function()
+    if not CurrentTarget or not CurrentTarget.Character then return end
+
+    local char = Player.Character
+    if not char then return end
+
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    local targetHRP = CurrentTarget.Character:FindFirstChild("HumanoidRootPart")
+
+    if not hrp or not targetHRP then return end
+
+    local behindPos = targetHRP.CFrame * CFrame.new(0, HEIGHT_OFFSET, DIST_BEHIND)
+
+    -- bay mượt
+    hrp.CFrame = hrp.CFrame:Lerp(behindPos, FOLLOW_SMOOTH)
+
+    -- lock mặt
+    hrp.CFrame = CFrame.new(hrp.Position, targetHRP.Position)
+end)
+
+--// HOP SERVER
+local PlaceID = game.PlaceId
+
+local function HopServer()
+    local req = game:HttpGet(
+        "https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100"
+    )
+
+    local data = HttpService:JSONDecode(req)
+
+    for _, v in pairs(data.data) do
+        if v.playing < v.maxPlayers and v.id ~= game.JobId then
+            TeleportService:TeleportToPlaceInstance(PlaceID, v.id, Player)
+            break
+        end
+    end
+end
+
+--// MAIN AI
 task.spawn(function()
     while true do
         task.wait(1)
 
-        local target = GetTarget()
-        if target then
-            AddUsed(target)
+        if not LockTarget then
+            local target = GetTarget()
 
-            pcall(function()
-                GoBehind(target)
+            if target then
+                CurrentTarget = target
+                EquipFruit()
 
                 local hasDamage = IsTakingDamage(target)
 
-                if not hasDamage then
-                    task.wait(1)
+                if hasDamage then
+                    LockTarget = true -- 🔒 khóa target
                 else
-                    task.wait(SCAN_INTERVAL)
+                    CurrentTarget = nil
                 end
-            end)
+            else
+                print("Không có người -> hop server")
+
+                task.wait(3)
+
+                if not GetTarget() then
+                    HopServer()
+                end
+            end
         else
-            UsedTargets = {}
-            task.wait(2)
+            -- đang lock
+            if not CurrentTarget 
+            or not CurrentTarget.Character 
+            or CurrentTarget.Character:FindFirstChild("Humanoid").Health <= 0 then
+
+                LockTarget = false
+                CurrentTarget = nil
+            end
         end
     end
 end)
