@@ -92,9 +92,38 @@ if not getgenv().Setting.Another then
     }
 end
 
+if not getgenv().Setting.Gun then
+    getgenv().Setting.Gun = {
+        ["Enable"] = false,
+        ["GunMode"] = false,
+        ["Delay"] = 0.1
+    }
+end
 
--- Khởi tạo biến toàn cục
-getgenv().targ = nil 
+if not getgenv().Setting.Melee then
+    getgenv().Setting.Melee = {
+        ["Enable"] = false,
+        ["Delay"] = 0.1
+    }
+end
+
+if not getgenv().Setting.Sword then
+    getgenv().Setting.Sword = {
+        ["Enable"] = false,
+        ["Delay"] = 0.1
+    }
+end
+
+if not getgenv().Setting.Fruit then
+    getgenv().Setting.Fruit = {
+        ["Enable"] = false,
+        ["Delay"] = 0.1
+    }
+end
+
+
+getgenv().weapon = nil
+getgenv().targ = nil
 getgenv().lasttarrget = nil
 getgenv().checked = {}
 getgenv().pl = game.Players:GetPlayers()
@@ -501,17 +530,4 @@ end
 function InvisibleObject()
     for i, v in pairs(game:GetService("Workspace"):GetDescendants()) do
         if (v:IsA("Part") or v:IsA("MeshPart") or v:IsA("BasePart")) and v.Transparency then
-            v.Transparency = 1
-        end
-    end
-    
-    spawn(function()
-        pcall(function()
-            if game.ReplicatedStorage.Effect.Container:FindFirstChild("Death") then
-                game.ReplicatedStorage.Effect.Container.Death:Destroy()
-            end
-            if game.ReplicatedStorage.Effect.Container:FindFirstChild("Respawn") then
-                game.ReplicatedStorage.Effect.Container.Respawn:Destroy()
-            end
-            if game.ReplicatedStorage.Effect.Container:FindFirstChild("Hit") then
-                game.ReplicatedSt
+            v.Transp
