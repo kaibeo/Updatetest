@@ -270,6 +270,42 @@ local StartAttackTime, IsReached = 0, false
 local startSession, lastHopTime = os.time(), os.time()
 local CurrentTween = nil
 
+local function BypassTP(hrp, targetCF)
+    if not hrp then return end
+
+    -- tạo lực bay
+    local bv = hrp:FindFirstChild("TP_Bypass")
+    if not bv then
+        bv = Instance.new("BodyVelocity")
+        bv.Name = "TP_Bypass"
+        bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        bv.Velocity = Vector3.zero
+        bv.Parent = hrp
+    end
+
+    local dist = (hrp.Position - targetCF.Position).Magnitude
+
+    -- chia trạng thái TP
+    if dist > 120 then
+        -- TP xa (chia bước anti detect)
+        for i = 1, 4 do
+            hrp.CFrame = hrp.CFrame:Lerp(targetCF, 0.3)
+            task.wait()
+        end
+        bv.Velocity = (targetCF.Position - hrp.Position).Unit * 180
+
+    elseif dist > 40 then
+        -- bay nhanh
+        hrp.CFrame = hrp.CFrame:Lerp(targetCF, 0.4)
+        bv.Velocity = (targetCF.Position - hrp.Position).Unit * 160
+
+    else
+        -- bám sát
+        hrp.CFrame = hrp.CFrame:Lerp(targetCF, 0.7)
+        bv.Velocity = Vector3.zero
+    end
+end
+
 NextBtn.MouseButton1Click:Connect(function() _G.TargetPlayer = nil end)
 HopBtn.MouseButton1Click:Connect(function() HopServer() end)
 
@@ -310,84 +346,23 @@ task.spawn(function()
                 end
 
                 if CurrentTween then CurrentTween:Cancel() end
--- // SERVICES
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+                -- Teleport thẳng vào target nếu còn xa, tween nếu đã gần
+local targetCF = thit.CFrame * CFrame.new(0, 6, 0)
+BypassTP(hrp, targetCF)
+            else
+                if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and lp.Character.HumanoidRootPart:FindFirstChild("BananaFix") then
+                    lp.Character.HumanoidRootPart.BananaFix:Destroy()
+                end
 
--- // PLAYER
-local lp = Players.LocalPlayer
-
--- // SETTINGS
-local TP_DELAY = 0.03
-local TP_REPEAT = 3
-
--- // GET HRP
-local function GetHRP()
-    local char = lp.Character
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        return char.HumanoidRootPart
-    end
-end
-
--- // ANTI KÉO NGƯỢC (CHẠY NGẦM)
-task.spawn(function()
-    while true do
-        local hrp = GetHRP()
-        if hrp then
-            hrp.Velocity = Vector3.new(0,0,0)
-            hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
-        end
-        task.wait()
+                if CurrentTween then CurrentTween:Cancel() end
+                StatusL.Text = string.format("Status: Searching... | Hop: %ds", hopCountdown)
+                local players = Players:GetPlayers()
+                _G.TargetPlayer = players[math.random(1, #players)]
+                if _G.TargetPlayer == lp then _G.TargetPlayer = nil end
+                IsReached, StartAttackTime = false, 0
+            end
+        end)
     end
 end)
-
--- // TP BYPASS CORE
-local function TPBypass(targetCF)
-    local hrp = GetHRP()
-    if not hrp then return end
-
-    for i = 1, TP_REPEAT do
-        hrp.Velocity = Vector3.new(0,0,0)
-        hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
-
-        -- TP + giữ ổn định
-        hrp.CFrame = targetCF
-
-        -- spam nhẹ để tránh server kéo
-        task.wait(TP_DELAY)
-    end
-end
-
--- // TP SAFE (khuyên dùng)
-local function TPSafe(targetCF)
-    local hrp = GetHRP()
-    if not hrp then return end
-
-    -- TP 2 lần ngay lập tức (bypass mạnh hơn)
-    hrp.CFrame = targetCF
-    task.wait()
-    hrp.CFrame = targetCF
-
-    -- thêm bypass spam
-    TPBypass(targetCF)
-end
-
--- // TP TO TARGET (TRÊN ĐẦU)
-function TPToTarget(targetHRP)
-    if not targetHRP then return end
-
-    local targetPos = targetHRP.CFrame * CFrame.new(0, 7, 0)
-    TPSafe(targetPos)
-end
-
--- // EXAMPLE USE:
--- TPToTarget(enemy.Character.HumanoidRootPart)
-
--- // RETURN (nếu bạn muốn require)
-return {
-    TPBypass = TPBypass,
-    TPSafe = TPSafe,
-    TPToTarget = TPToTarget
-}
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/duy260414-lang/Fastattack/refs/heads/main/Ultra"))()
