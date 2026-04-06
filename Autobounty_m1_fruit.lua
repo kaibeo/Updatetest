@@ -273,6 +273,25 @@ local CurrentTween = nil
 local function BypassTP(hrp, targetCF)
     if not hrp then return end
 
+    local bv = hrp:FindFirstChild("TP_Bypass")
+    if not bv then
+        bv = Instance.new("BodyVelocity")
+        bv.Name = "TP_Bypass"
+        bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+        bv.Parent = hrp
+    end
+
+    local dist = (hrp.Position - targetCF.Position).Magnitude
+
+    if dist > 80 then
+        hrp.CFrame = targetCF
+    else
+        local predict = targetCF.Position
+        hrp.CFrame = hrp.CFrame:Lerp(CFrame.new(predict.X, predict.Y + 5, predict.Z), 0.85)
+        bv.Velocity = (predict - hrp.Position).Unit * 220
+    end
+end
+
     -- tạo lực bay
     local bv = hrp:FindFirstChild("TP_Bypass")
     if not bv then
@@ -310,7 +329,7 @@ NextBtn.MouseButton1Click:Connect(function() _G.TargetPlayer = nil end)
 HopBtn.MouseButton1Click:Connect(function() HopServer() end)
 
 task.spawn(function()
-    while task.wait(0.2) do
+    while task.wait(0.1) do
         pcall(function()
             local now = os.time()
             TimeL.Text = "Time: " .. string.format("%dh%dm%ds", math.floor((now-startSession)/3600), math.floor(((now-startSession)%3600)/60), (now-startSession)%60)
@@ -347,12 +366,11 @@ task.spawn(function()
 
                 if CurrentTween then CurrentTween:Cancel() end
                 -- Teleport thẳng vào target nếu còn xa, tween nếu đã gần
-local targetCF = thit.CFrame * CFrame.new(0, 6, 0)
+local velocity = thit.Velocity or Vector3.zero
+local predictPos = thit.Position + (velocity * 0.15)
+
+local targetCF = CFrame.new(predictPos.X, predictPos.Y + 5, predictPos.Z)
 BypassTP(hrp, targetCF)
-            else
-                if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and lp.Character.HumanoidRootPart:FindFirstChild("BananaFix") then
-                    lp.Character.HumanoidRootPart.BananaFix:Destroy()
-                end
 
                 if CurrentTween then CurrentTween:Cancel() end
                 StatusL.Text = string.format("Status: Searching... | Hop: %ds", hopCountdown)
