@@ -194,7 +194,7 @@ local function AddLabel(text, color, size)
     return l
 end
 
-local Title = AddLabel("Ziner BOUNTY HUNTER", Color3.fromRGB(255, 200, 80), 50)
+local Title = AddLabel("Ziner Hub Auto Bounty M1", Color3.fromRGB(255, 200, 80), 50)
 local TimeL = AddLabel("Time: 0h0m0s", Color3.fromRGB(255, 255, 255), 26)
 local BountyL = AddLabel("Bounty: 0", Color3.fromRGB(255, 255, 255), 26)
 local StatusL = AddLabel("Status: Initializing...", Color3.fromRGB(255, 255, 255), 16)
@@ -270,66 +270,11 @@ local StartAttackTime, IsReached = 0, false
 local startSession, lastHopTime = os.time(), os.time()
 local CurrentTween = nil
 
-local function BypassTP(hrp, targetCF)
-    if not hrp then return end
-
-    local bv = hrp:FindFirstChild("TP_Bypass")
-    if not bv then
-        bv = Instance.new("BodyVelocity")
-        bv.Name = "TP_Bypass"
-        bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-        bv.Parent = hrp
-    end
-
-    local dist = (hrp.Position - targetCF.Position).Magnitude
-
-    if dist > 80 then
-        hrp.CFrame = targetCF
-    else
-        local predict = targetCF.Position
-        hrp.CFrame = hrp.CFrame:Lerp(CFrame.new(predict.X, predict.Y + 5, predict.Z), 0.85)
-        bv.Velocity = (predict - hrp.Position).Unit * 220
-    end
-end
-
-    -- tạo lực bay
-    local bv = hrp:FindFirstChild("TP_Bypass")
-    if not bv then
-        bv = Instance.new("BodyVelocity")
-        bv.Name = "TP_Bypass"
-        bv.MaxForce = Vector3.new(9e9, 9e9, 9e9)
-        bv.Velocity = Vector3.zero
-        bv.Parent = hrp
-    end
-
-    local dist = (hrp.Position - targetCF.Position).Magnitude
-
-    -- chia trạng thái TP
-    if dist > 120 then
-        -- TP xa (chia bước anti detect)
-        for i = 1, 4 do
-            hrp.CFrame = hrp.CFrame:Lerp(targetCF, 0.3)
-            task.wait()
-        end
-        bv.Velocity = (targetCF.Position - hrp.Position).Unit * 180
-
-    elseif dist > 40 then
-        -- bay nhanh
-        hrp.CFrame = hrp.CFrame:Lerp(targetCF, 0.4)
-        bv.Velocity = (targetCF.Position - hrp.Position).Unit * 160
-
-    else
-        -- bám sát
-        hrp.CFrame = hrp.CFrame:Lerp(targetCF, 0.7)
-        bv.Velocity = Vector3.zero
-    end
-end
-
 NextBtn.MouseButton1Click:Connect(function() _G.TargetPlayer = nil end)
 HopBtn.MouseButton1Click:Connect(function() HopServer() end)
 
 task.spawn(function()
-    while task.wait(0.1) do
+    while task.wait(0.2) do
         pcall(function()
             local now = os.time()
             TimeL.Text = "Time: " .. string.format("%dh%dm%ds", math.floor((now-startSession)/3600), math.floor(((now-startSession)%3600)/60), (now-startSession)%60)
@@ -365,12 +310,12 @@ task.spawn(function()
                 end
 
                 if CurrentTween then CurrentTween:Cancel() end
-                -- Teleport thẳng vào target nếu còn xa, tween nếu đã gần
-local velocity = thit.Velocity or Vector3.zero
-local predictPos = thit.Position + (velocity * 0.15)
-
-local targetCF = CFrame.new(predictPos.X, predictPos.Y + 5, predictPos.Z)
-BypassTP(hrp, targetCF)
+                CurrentTween = TweenService:Create(hrp, TweenInfo.new(dist/350, Enum.EasingStyle.Linear), {CFrame = thit.CFrame * CFrame.new(0, 7, 0)})
+                CurrentTween:Play()
+            else
+                if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and lp.Character.HumanoidRootPart:FindFirstChild("BananaFix") then
+                    lp.Character.HumanoidRootPart.BananaFix:Destroy()
+                end
 
                 if CurrentTween then CurrentTween:Cancel() end
                 StatusL.Text = string.format("Status: Searching... | Hop: %ds", hopCountdown)
@@ -383,4 +328,14 @@ BypassTP(hrp, targetCF)
     end
 end)
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/duy260414-lang/Fastattack/refs/heads/main/Ultra"))()
+_G.AttackM = true
+_G.AttackP = true
+_G.Animation = true
+
+local Load = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dex-Bear/VxezeHubLoader/refs/heads/main/FastAttack.lua"))()
+
+task.spawn(function()
+    while task.wait(0.03) do
+        Load:Attack()
+    end
+end)
