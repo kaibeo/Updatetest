@@ -233,35 +233,52 @@ task.spawn(function()
     end
 end)
 
-local function HopServer()
-    local Api = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Desc&limit=100"
-    local function GetServers(cursor)
-        local success, result = pcall(function() return game:HttpGet(Api .. (cursor and "&cursor=" .. cursor or "")) end)
-        if success then return HttpService:JSONDecode(result) end
-    end
-    
-    local sList = GetServers()
-    local ValidServers = {}
-    
-    while sList do
-        for _, s in pairs(sList.data) do
-            
-            if s.playing <= 10 and s.id ~= game.JobId then
-                table.insert(ValidServers, s.id)
-            end
+local Visited = {}
+
+function HopServer()
+    local cursor = ""
+    local servers = {}
+
+    for i = 1, 5 do
+        local url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+        if cursor ~= "" then
+            url = url .. "&cursor=" .. cursor
         end
-        
-        if #ValidServers >= 5 or not sList.nextPageCursor then break end
-        sList = GetServers(sList.nextPageCursor)
-        task.wait(0.1)
+
+        local success, data = pcall(function()
+            return game:GetService("HttpService"):JSONDecode(game:HttpGet(url))
+        end)
+
+        if success and data and data.data then
+            for _, v in pairs(data.data) do
+                if v.playing < v.maxPlayers 
+                and v.id ~= game.JobId 
+                and not Visited[v.id] then
+                    
+                    table.insert(servers, v)
+                end
+            end
+
+            cursor = data.nextPageCursor
+            if not cursor then break end
+        else
+            break
+        end
+
+        task.wait(0.2)
     end
 
-    if #ValidServers > 0 then
-        
-        local randomServer = ValidServers[math.random(1, #ValidServers)]
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, randomServer, lp)
+    if #servers > 0 then
+        local chosen = servers[math.random(1, #servers)]
+        Visited[chosen.id] = true
+
+        print("Hop:", chosen.id, "| Players:", chosen.playing)
+
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, chosen.id, game.Players.LocalPlayer)
     else
-        print("Không tìm thấy server nào trống slot!")
+        warn("Không có server, retry...")
+        task.wait(2)
+        HopServer()
     end
 end
 
