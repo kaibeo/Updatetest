@@ -1,5 +1,5 @@
 -- Cài đặt team và khởi tạo biến
-getgenv().team = "Pirates" -- Pirates
+getgenv().team = "Marines" -- Pirates
 
 -- Đợi game tải hoàn chỉnh
 repeat wait() until game:IsLoaded() and game.Players.LocalPlayer:FindFirstChild("DataLoaded")
@@ -530,4 +530,708 @@ end
 function InvisibleObject()
     for i, v in pairs(game:GetService("Workspace"):GetDescendants()) do
         if (v:IsA("Part") or v:IsA("MeshPart") or v:IsA("BasePart")) and v.Transparency then
-            v.Transp
+            v.Transparency = 1
+        end
+    end
+    
+    spawn(function()
+        pcall(function()
+            if game.ReplicatedStorage.Effect.Container:FindFirstChild("Death") then
+                game.ReplicatedStorage.Effect.Container.Death:Destroy()
+            end
+            if game.ReplicatedStorage.Effect.Container:FindFirstChild("Respawn") then
+                game.ReplicatedStorage.Effect.Container.Respawn:Destroy()
+            end
+            if game.ReplicatedStorage.Effect.Container:FindFirstChild("Hit") then
+                game.ReplicatedStorage.Effect.Container.Hit:Destroy()
+            end
+        end)
+    end)
+end
+
+ObjectRemove()
+InvisibleObject()
+
+-- White Screen
+if getgenv().Setting.Another.WhiteScreen then
+    game:GetService("RunService"):Set3dRenderingEnabled(false)
+end	
+
+-- === HÀM CHÍNH AUTO BOUNTY ===
+-- Kiểm tra fruit
+function hasValue(array, targetString)
+    if not array then return false end
+    for _, value in ipairs(array) do
+        if value == targetString then
+            return true
+        end
+    end
+    return false
+end
+
+-- Fast Attack
+_G.AttackM = true
+_G.AttackP = true
+_G.Animation = true
+
+local Load = loadstring(game:HttpGet("https://raw.githubusercontent.com/Dex-Bear/VxezeHubLoader/refs/heads/main/FastAttack.lua"))()
+
+task.spawn(function()
+    while task.wait(0.03) do
+        Load:Attack()
+    end
+end)
+
+local fastattack = getgenv().Setting and getgenv().Setting.Click and getgenv().Setting.Click.FastClick
+local y = nil
+
+if fastattack then
+    -- Cố gắng lấy CombatFramework
+    pcall(function()
+        local CameraShaker = require(game.ReplicatedStorage.Util.CameraShaker)
+        if CameraShaker then
+            CameraShaker:Stop()
+        end
+        
+        if game:GetService("Players").LocalPlayer:FindFirstChild("PlayerScripts") then
+            local success, result = pcall(function()
+                return require(game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework"))
+            end)
+            
+            if success and result then
+                local getCombatFramework = result
+                local getCombatFrameworkR = debug.getupvalues(getCombatFramework)[2]
+                y = getCombatFrameworkR
+            end
+        end
+    end)
+    
+    spawn(function()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if fastattack and y and typeof(y) == "table" then
+                pcall(function()
+                    if y.activeController then
+                        y.activeController.timeToNextAttack = 0
+                        y.activeController.hitboxMagnitude = 60
+                        y.activeController.active = false
+                        y.activeController.timeToNextBlock = 0
+                        y.activeController.focusStart = 1655503339.0980349
+                        y.activeController.increment = 1
+                        y.activeController.blocking = false
+                        y.activeController.attacking = false
+                        if y.activeController.humanoid then
+                            y.activeController.humanoid.AutoRotate = true
+                        end
+                    end
+                end)
+            end
+        end)
+    end)
+    
+    spawn(function()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if fastattack == true and lp and lp.Character then
+                if lp.Character:FindFirstChild("Stun") then
+                    lp.Character.Stun.Value = 0
+                end
+                if lp.Character:FindFirstChild("Busy") then
+                    lp.Character.Busy.Value = false 
+                end
+            end
+        end)
+    end)
+else
+    local y = nil
+    
+    -- Cố gắng lấy CombatFramework
+    pcall(function()
+        if game:GetService("Players").LocalPlayer:FindFirstChild("PlayerScripts") then
+            local success, result = pcall(function()
+                return require(game:GetService("Players").LocalPlayer.PlayerScripts:FindFirstChild("CombatFramework"))
+            end)
+            
+            if success and result then
+                local getCombatFramework = result
+                local getCombatFrameworkR = debug.getupvalues(getCombatFramework)[2]
+                y = getCombatFrameworkR
+            end
+        end
+    end)
+    
+    spawn(function()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if y and typeof(y) == "table" then
+                pcall(function()
+                    if y.activeController then
+                        y.activeController.hitboxMagnitude = 60
+                        y.activeController.active = false
+                        y.activeController.timeToNextBlock = 0
+                        y.activeController.focusStart = 1655503339.0980349
+                        y.activeController.increment = 1
+                        y.activeController.blocking = false
+                        y.activeController.attacking = false
+                        if y.activeController.humanoid then
+                            y.activeController.humanoid.AutoRotate = true
+                        end
+                    end
+                end)
+            end
+        end)
+    end)
+end
+
+-- Circle
+local radius = 25
+local speedCircle = 30
+local angle = 0
+local yTween = 5
+local function getNextPosition(center)
+    angle = angle + speedCircle
+    return center + Vector3.new(math.sin(math.rad(angle)) * radius, yTween, math.cos(math.rad(angle)) * radius)
+end
+
+-- Hop Server
+local hopserver = false
+local starthop = false
+local stopbypass = false
+
+spawn(function()
+    while task.wait() do
+        if hopserver then
+            stopbypass = true
+            starthop = true
+        end
+    end
+end)
+
+spawn(function()
+    while task.wait() do
+        if starthop then
+            repeat task.wait()
+                if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                    to(lp.Character.HumanoidRootPart.CFrame*CFrame.new(0, math.random(500, 10000), 0))
+                end
+            until (lp.PlayerGui and lp.PlayerGui:FindFirstChild("Main") and 
+                  lp.PlayerGui.Main:FindFirstChild("InCombat") and
+                  lp.PlayerGui.Main.InCombat.Visible and 
+                  not string.find(string.lower(lp.PlayerGui.Main.InCombat.Text), "risk")) or 
+                  (lp.PlayerGui and lp.PlayerGui:FindFirstChild("Main") and
+                  lp.PlayerGui.Main:FindFirstChild("InCombat") and 
+                  not lp.PlayerGui.Main.InCombat.Visible)
+            
+            if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                to(CFrame.new(0, 10000, 0))
+            end
+            
+            HopServer()
+            
+            if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") then
+                to(lp.Character.HumanoidRootPart.CFrame*CFrame.new(0, math.random(500, 10000), 0))
+            end
+        end
+    end
+end)
+
+-- Hàm chuyển server
+function CheckInComBat()
+    return game.Players.LocalPlayer.PlayerGui.Main.BottomHUDList.InCombat.Visible and game.Players.LocalPlayer.PlayerGui.Main.BottomHUDList.InCombat.Text and (string.find(string.lower(game.Players.LocalPlayer.PlayerGui.Main.BottomHUDList.InCombat.Text),"risk"))
+end 
+function HopServer(counts)
+    if counts == nil then
+        counts = 10
+    end
+    local function nigga(v)
+        if v.Name == "ErrorPrompt" then
+            if v.Visible then
+                if v.TitleFrame.ErrorTitle.Text == "Teleport Failed" then
+                    v.Visible = false
+                end
+            end
+            v:GetPropertyChangedSignal("Visible"):Connect(
+                function()
+                    if v.Visible then
+                        if v.TitleFrame.ErrorTitle.Text == "Teleport Failed" then
+                            v.Visible = false
+                        end
+                    end
+                end
+            )
+        end
+    end
+    for i, v in pairs(game.CoreGui.RobloxPromptGui.promptOverlay:GetChildren()) do
+        nigga(v)
+    end
+    game.CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(nigga)
+    game:GetService("Players").LocalPlayer.PlayerGui.ServerBrowser.Frame.Filters.SearchRegion.TextBox.Text = "Singapore"
+    while wait() do
+        if not CheckInComBat() then
+            for r = 1, math.huge do
+                for k, v in game.ReplicatedStorage.__ServerBrowser:InvokeServer(r) do
+                    if k ~= game.JobId and v["Count"] <= counts then
+                        game.ReplicatedStorage.__ServerBrowser:InvokeServer("teleport", k)
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- Đăng ký hàm HopServer cho UI
+getgenv().HopServer = HopServer
+
+-- Skip Player
+function SkipPlayer()
+    UI.ShowNotification("Đã bỏ qua người chơi", "warning")
+    
+    getgenv().killed = getgenv().targ 
+    if getgenv().targ then
+        table.insert(getgenv().checked, getgenv().targ)
+    end
+    getgenv().targ = nil
+    UI.SetTarget("None")
+    target()
+end
+
+-- Đăng ký hàm SkipPlayer cho UI
+getgenv().SkipPlayer = SkipPlayer
+
+-- Target Selection
+function target() 
+    pcall(function()
+        UI.ShowNotification("Đang tìm mục tiêu mới...", "info")
+        
+        local d = math.huge
+        local p = nil
+        getgenv().targ = nil
+        
+        for _, v in pairs(game.Players:GetPlayers()) do 
+            if v.Team ~= nil and (tostring(lp.Team) == "Pirates" or (tostring(v.Team) == "Pirates" and tostring(lp.Team) ~= "Pirates")) then
+                if v and v:FindFirstChild("Data") and ((getgenv().Setting.Skip.Fruit and hasValue(getgenv().Setting.Skip.FruitList, v.Data.DevilFruit.Value) == false) or not getgenv().Setting.Skip.Fruit) then
+                    if v ~= lp and v ~= getgenv().targ and 
+                       v.Character and v.Character:FindFirstChild("HumanoidRootPart") and
+                       (v.Character.HumanoidRootPart.CFrame.Position - lp.Character.HumanoidRootPart.CFrame.Position).Magnitude < d and 
+                       not hasValue(getgenv().checked, v) and 
+                       v.Character.HumanoidRootPart.CFrame.Y <= 12000 then
+                        
+                        if (tonumber(lp.Data.Level.Value) - 250) < v.Data.Level.Value then
+                            if v.leaderstats["Bounty/Honor"] and 
+                               v.leaderstats["Bounty/Honor"].Value >= getgenv().Setting.Hunt.Min and 
+                               v.leaderstats["Bounty/Honor"].Value <= getgenv().Setting.Hunt.Max and 
+                               not hopserver then 
+                                
+                                if (getgenv().Setting.Skip.V4 and not v.Character:FindFirstChild("RaceTransformed")) or not getgenv().Setting.Skip.V4 then
+                                    p = v 
+                                    d = (v.Character.HumanoidRootPart.CFrame.Position - lp.Character.HumanoidRootPart.CFrame.Position).Magnitude 
+                                    
+                                    if getgenv().Setting.Chat.Enabled and getgenv().Setting.Chat.List and #getgenv().Setting.Chat.List > 0 then
+                                        local chatMsg = getgenv().Setting.Chat.List[math.random(1, #getgenv().Setting.Chat.List)]
+                                        if chatMsg then
+                                            game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):FindFirstChild("SayMessageRequest"):FireServer(chatMsg, "All")
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end 
+                end
+            end
+        end 
+        
+        if p == nil then 
+            HopServer()
+            UI.ShowNotification("Không tìm thấy mục tiêu, đang chuyển server...", "warning")
+        else
+            UI.ShowNotification("Đã tìm thấy mục tiêu: " .. p.Name, "success")
+            UI.SetTarget(p.Name)
+        end
+        
+        getgenv().targ = p
+        UI.UpdateTargetsList()
+    end)
+end
+function CheckSafeZone(nitga)
+    for r, v in pairs(workspace['_WorldOrigin']['SafeZones']:GetChildren()) do
+        if v and v:IsA("Part") then
+            if (v.Position - nitga.Position).Magnitude <= 400 then
+                return true
+            end
+        end
+    end
+    return false
+end
+-- Kết nối Ken khi gần với mục tiêu
+spawn(function()
+    while wait() do
+        pcall(function()
+            if getgenv().targ and getgenv().targ.Character and lp.Character and
+               (getgenv().targ.Character.HumanoidRootPart.CFrame.Position - lp.Character.HumanoidRootPart.CFrame.Position).Magnitude < 40 then
+                Ken()
+            end
+        end)
+    end
+end)
+
+-- PvP và khả năng đặc biệt
+spawn(function()
+    while task.wait() do 
+        pcall(function()
+            if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("Main") and
+               game:GetService("Players").LocalPlayer.PlayerGui.Main:FindFirstChild("PvpDisabled") and
+               game:GetService("Players").LocalPlayer.PlayerGui.Main.PvpDisabled.Visible == true then
+                game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer("EnablePvp")
+            end
+            
+            if getgenv().targ and getgenv().targ.Character and lp.Character and
+               (getgenv().targ.Character.HumanoidRootPart.CFrame.Position - lp.Character.HumanoidRootPart.CFrame.Position).Magnitude < 50 then
+                buso()
+                
+                if getgenv().Setting.Another.V3 then
+                    if getgenv().Setting.Another.CustomHealth and 
+                       lp.Character.Humanoid.Health <= getgenv().Setting.Another.Health then
+                        down("T")
+                    end
+                end
+                
+                if getgenv().Setting.Another.V4 then
+                    down("Y")
+                end   
+            end
+        end)
+    end
+end)
+
+-- Kiểm tra thông báo về cái chết của người chơi
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            if lp.PlayerGui:FindFirstChild("Notifications") then
+                for _, v in pairs(lp.PlayerGui.Notifications:GetChildren()) do 
+                    if v:IsA("TextLabel") and (string.find(string.lower(v.Text), "player") or string.find(string.lower(v.Text), "người chơi")) then 
+                        SkipPlayer()
+                        pcall(function() v:Destroy() end)
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+-- Logic di chuyển và định vị
+local a, b
+local Nguvc = 5
+local helloae = false
+local safehealth = false
+
+spawn(function()
+    while task.wait(0.05) do
+        if not getgenv().targ then target() end
+        if not getgenv().targ then hopserver = true end 
+        if not game:GetService("Players").LocalPlayer.PlayerGui.Main.BottomHUDList.PvpDisabled.Visible then
+            pcall(function()
+                if getgenv().targ.Character and getgenv().targ.Character:FindFirstChild("HumanoidRootPart") and 
+                lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and
+                lp.Character:FindFirstChild("Humanoid") then
+                    
+                    if lp.Character.Humanoid.Health > getgenv().Setting.SafeHealth.Health then
+                        pcall(function()    
+                            if not (game:GetService("Workspace")["_WorldOrigin"].Locations:FindFirstChild("Island 1") and 
+                                getgenv().targ:DistanceFromCharacter(game:GetService("Workspace")["_WorldOrigin"].Locations:FindFirstChild("Island 1").Position) < 10000) then
+                                workspace.CurrentCamera.CameraSubject = getgenv().targ.Character
+                                if (getgenv().targ.Character:WaitForChild("HumanoidRootPart").CFrame.Position - lp.Character:WaitForChild("HumanoidRootPart").CFrame.Position).Magnitude < 40 then 
+                                    if game:GetService("Players").LocalPlayer.PlayerGui.Main.SafeZone.Visible == true then
+                                        print("Safe Zone")
+                                        SkipPlayer()
+                                    end
+                                    if getgenv().targ.Character.Humanoid.Health > 0 then
+                                        if getgenv().Setting.Click.AlwaysClick then
+                                            Click()
+                                        end
+                                        
+                                        if helloae then
+                                            to(getgenv().targ.Character.HumanoidRootPart.CFrame * CFrame.new(0, 5, 5))
+                                        else
+                                            to(getgenv().targ.Character.HumanoidRootPart.CFrame * CFrame.new(0, 5, 5))
+                                        end
+                                    else 
+                                        print("Player Died")
+                                        SkipPlayer()
+                                    end
+                                else
+                                    if getgenv().targ.Character.Humanoid.Health > 0 then
+                                        to(getgenv().targ.Character.HumanoidRootPart.CFrame * CFrame.new(0, 5, 5))
+                                    else
+                                        print("Player Died")
+                                        SkipPlayer()
+                                    end
+                                end
+                            else
+                                print("Raid")
+                                SkipPlayer()
+                            end
+                        end)
+                        
+                        a = getgenv().targ.Character.HumanoidRootPart.Position
+                        
+                        if a ~= b then
+                            yTween = 0
+                            b = a
+                            Nguvc = 15
+                        else
+                            yTween = 5
+                            Nguvc = 5
+                        end
+                        
+                        if getgenv().targ.Character.HumanoidRootPart.CFrame.Y >= 10 then
+                            helloae = true
+                        else
+                            helloae = false
+                        end
+                    else
+                        safehealth = true
+                        
+                        if getgenv().targ.Character:FindFirstChild("HumanoidRootPart") then
+                            to(getgenv().targ.Character.HumanoidRootPart.CFrame * CFrame.new(0, math.random(5000, 100000), 0))
+                        end
+                    end
+                end
+            end)
+        else
+            game.ReplicatedStorage.Remotes.CommF_:InvokeServer("EnablePvp")
+        end
+    end
+end)
+
+-- Logic nhắm
+local aim = false
+local CFrameHunt
+
+spawn(function()
+    while task.wait() do 
+        if getgenv().targ and getgenv().targ.Character and 
+           lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and
+           (getgenv().targ.Character:WaitForChild("HumanoidRootPart").CFrame.Position - lp.Character:WaitForChild("HumanoidRootPart").CFrame.Position).Magnitude < 40 then 
+            
+            aim = true 
+            CFrameHunt = CFrame.new(
+                getgenv().targ.Character.HumanoidRootPart.Position + 
+                getgenv().targ.Character.HumanoidRootPart.CFrame.LookVector * 5, 
+                getgenv().targ.Character.HumanoidRootPart.Position
+            )
+        else
+            aim = false
+        end
+    end
+end)
+
+-- Khóa camera
+spawn(function()
+    while task.wait() do
+        if getgenv().Setting.Another.LockCamera then
+            local targetPlayer = getgenv().targ
+            
+            if targetPlayer and targetPlayer.Character then
+                local targetCharacter = targetPlayer.Character
+                local camera = game.Workspace.CurrentCamera
+                
+                if targetCharacter and targetCharacter:FindFirstChild("HumanoidRootPart") then
+                    local lookAtPos = targetCharacter.HumanoidRootPart.Position
+                    local cameraPos = camera.CFrame.Position
+                    local newLookAt = CFrame.new(cameraPos, lookAtPos)
+                    camera.CFrame = newLookAt
+                end
+            end
+        end
+    end
+end)
+
+-- Tự động tham gia lại khi mất kết nối
+game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
+    if not hopserver and child.Name == 'ErrorPrompt' and child:FindFirstChild('MessageArea') and child.MessageArea:FindFirstChild("ErrorFrame") then
+        print("Cuttay Auto Bounty | Đang vào lại!")
+        UI.ShowNotification("Bị ngắt kết nối, đang vào lại...", "warning")
+        game:GetService("TeleportService"):Teleport(game.PlaceId)
+    end
+end)
+
+-- === WEBHOOK ===
+local Urlsent = getgenv().Setting.Webhook.Url
+
+function wSend(main)
+    spawn(function()
+        local success, error = pcall(function()
+            local Data = game:GetService("HttpService"):JSONEncode(main)
+            local Head = {["content-type"] = "application/json"}
+            local Send = http_request or request or HttpPost or syn.request 
+            
+            if Send then 
+                Send({Url = Urlsent, Body = Data, Method = "POST", Headers = Head})
+            end
+        end)
+        
+        if not success then
+            print("Lỗi webhook: " .. tostring(error))
+        end
+    end)
+end 
+
+function wEarn(targ, earn, total) 
+    if getgenv().Setting.Webhook.Enabled and getgenv().killed then
+        local targetName = "Unknown"
+        if targ and targ.Name then
+            targetName = targ.Name
+        end
+        
+        local data = {
+            ["content"] = "",
+            ["embeds"] = {
+                {
+                    ["title"] = "**Cuttay Hub | Auto Bounty**",
+                    ["color"] = 3447003, -- Màu xanh dương Discord
+                    ["fields"] = {
+                        {
+                            ["name"] = "Tài khoản: ",
+                            ["value"] = "||"..game.Players.LocalPlayer.Name.."||",
+                            ["inline"] = false,
+                        },
+                        {
+                            ["name"] = "Mục tiêu: ",
+                            ["value"] = "```"..targetName.."```",
+                            ["inline"] = false,
+                        },
+                        {
+                            ["name"] = "Bounty thu được: ",
+                            ["value"] = "```Earned: "..tostring(earn).."```",
+                            ["inline"] = false,
+                        },
+                        {
+                            ["name"] = "Tổng Bounty: ",
+                            ["value"] = "```Earned: "..tostring(total).."```",
+                            ["inline"] = false,
+                        },
+                        {
+                            ["name"] = "Bounty hiện tại: ",
+                            ["value"] = "```"..(math.round((game.Players.LocalPlayer.leaderstats["Bounty/Honor"].Value / 1000000)*100)/100).."M```",
+                            ["inline"] = false,
+                        }
+                    },
+                    ["thumbnail"] = {
+                        ["url"] = "https://cdn.discordapp.com/attachments/1338107245983957013/1352284325386784850/Untitled524_20240705122146.png?ex=67dd746b&is=67dc22eb&hm=9271d0158ce1b078c61e2a5358ef80f1ff5e5619de9e159c2fe867a4a5ee734b&",
+                    },
+                    ["footer"] = {
+                        ["text"] = "Ziner hub Auto bounty",
+                    },
+                    ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+                }
+            }
+        }
+        
+        wSend(data)
+    end
+end
+
+-- === QUẢN LÝ CÀI ĐẶT ===
+local foldername = "Ziner Hub Auto Bounty"
+local filename = foldername.."/Settings.json"
+
+function saveSettings()
+    local HttpService = game:GetService("HttpService")
+    
+    pcall(function()
+        if not isfolder(foldername) then
+            makefolder(foldername)
+        end
+        
+        local json = HttpService:JSONEncode(getgenv().Setting)
+        writefile(filename, json)
+    end)
+end
+
+function loadSettings()
+    local HttpService = game:GetService("HttpService")
+    
+    pcall(function()
+        if isfolder(foldername) and isfile(filename) then
+            local settings = HttpService:JSONDecode(readfile(filename))
+            
+            -- Cập nhật cài đặt từ file
+            for category, values in pairs(settings) do
+                if getgenv().Setting[category] then
+                    for key, value in pairs(values) do
+                        getgenv().Setting[category][key] = value
+                    end
+                end
+            end
+        end
+    end)
+end
+
+-- Tải cài đặt
+loadSettings()
+
+-- === CẬP NHẬT THỐNG KÊ ===
+local Bounty = game:GetService("Players").LocalPlayer.leaderstats["Bounty/Honor"].Value
+local Earned = 0
+local startTime = tick()
+local OldTotalEarned = _G.TotalEarn or 0
+local TotalEarned = _G.TotalEarn or 0
+
+-- Hàm định dạng số
+function FormatNumber(number)
+    if number >= 1000000 then
+        return string.format("%.2fM", number / 1000000)
+    elseif number >= 1000 then
+        return string.format("%.1fK", number / 1000)
+    else
+        return tostring(number)
+    end
+end
+
+-- Luồng cập nhật thống kê
+spawn(function()
+    while task.wait() do
+        pcall(function()
+            Earned = game:GetService("Players").LocalPlayer.leaderstats["Bounty/Honor"].Value - Bounty
+            
+            -- Cập nhật thời gian
+            local elapsedTime = tick() - startTime
+            local hours = math.floor(elapsedTime / 3600)
+            local minutes = math.floor((elapsedTime % 3600) / 60)
+            local seconds = math.floor(elapsedTime % 60)
+            _G.Time = elapsedTime
+            
+            -- Định dạng thời gian
+            local timeString = string.format("%02d:%02d:%02d", hours, minutes, seconds)
+            
+            -- Cập nhật UI
+            UI.UpdateStats(
+                FormatNumber(Earned),
+                FormatNumber(TotalEarned + Earned),
+                FormatNumber(game:GetService("Players").LocalPlayer.leaderstats["Bounty/Honor"].Value)
+            )
+            
+            -- Cập nhật webhook nếu cần
+            if Earned ~= 0 and TotalEarned ~= OldTotalEarned + Earned then
+                TotalEarned = OldTotalEarned + Earned
+                _G.TotalEarn = TotalEarned 
+                saveSettings()
+                
+                if getgenv().killed then
+                    wEarn(getgenv().killed, Earned, TotalEarned)
+                end
+            end
+        end)
+    end
+end)
+
+-- Lưu cài đặt định kỳ
+spawn(function()
+    while task.wait(10) do
+        saveSettings()
+    end
+end)
+
+-- Khởi tạo danh sách người chơi
+UI.UpdateTargetsList()
+
+-- Cập nhật giao diện
+UI.ShowNotification("Auto Bounty đã sẵn sàng!", "success")
