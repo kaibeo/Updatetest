@@ -92,8 +92,8 @@ if not getgenv().Setting.Another then
     }
 end
 
+
 -- Khởi tạo biến toàn cục
-getgenv().weapon = nil
 getgenv().targ = nil 
 getgenv().lasttarrget = nil
 getgenv().checked = {}
@@ -362,6 +362,16 @@ function to(Pos)
     end)
 end
 
+-- Hàm nhấn phím
+local function down(key)
+    pcall(function()
+        game:GetService("VirtualUser"):CaptureController()
+        game:GetService("VirtualUser"):SetKeyDown(key)
+        task.wait(0.1)
+        game:GetService("VirtualUser"):SetKeyUp(key)
+    end)
+end
+
 -- Hàm sử dụng Buso (Haki)
 function buso()
     if lp.Character and not lp.Character:FindFirstChild("HasBuso") then
@@ -504,17 +514,4 @@ function InvisibleObject()
                 game.ReplicatedStorage.Effect.Container.Respawn:Destroy()
             end
             if game.ReplicatedStorage.Effect.Container:FindFirstChild("Hit") then
-                game.ReplicatedStorage.Effect.Container.Hit:Destroy()
-            end
-        end)
-    end)
-end
-
-ObjectRemove()
-InvisibleObject()
-
--- White Screen
-if getgenv().Setting.Another.WhiteScreen then
-    game:GetService("RunService"):Set3dRenderingEnabled(false)
-end	
-
+                game.ReplicatedSt
