@@ -236,52 +236,60 @@ end)
 local Visited = {}
 
 function HopServer()
-    local cursor = ""
-    local servers = {}
+    local PlaceID = game.PlaceId
+    local JobID = game.JobId
+    local Http = game:GetService("HttpService")
+    local TP = game:GetService("TeleportService")
+    local Player = game.Players.LocalPlayer
 
-    for i = 1, 5 do
-        local url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+    local cursor = ""
+    local found = false
+
+    for i = 1, 10 do -- quét nhiều page hơn cho chắc
+        local url = "https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100"
         if cursor ~= "" then
             url = url .. "&cursor=" .. cursor
         end
 
-        local success, data = pcall(function()
-            return game:GetService("HttpService"):JSONDecode(game:HttpGet(url))
+        local success, result = pcall(function()
+            return game:HttpGet(url)
         end)
 
-        if success and data and data.data then
+        if success and result then
+            local data = Http:JSONDecode(result)
+
             for _, v in pairs(data.data) do
-                if v.playing < v.maxPlayers 
-                and v.id ~= game.JobId 
+                if v.playing < v.maxPlayers
+                and v.id ~= JobID
                 and not Visited[v.id] then
                     
-                    table.insert(servers, v)
+                    Visited[v.id] = true
+                    found = true
+
+                    print("Đang hop →", v.id, "| Players:", v.playing)
+
+                    TP:TeleportToPlaceInstance(PlaceID, v.id, Player)
+                    task.wait(5)
+
+                    return
                 end
             end
 
             cursor = data.nextPageCursor
             if not cursor then break end
-        else
-            break
         end
 
-        task.wait(0.2)
+        task.wait(0.3)
     end
 
-    if #servers > 0 then
-        local chosen = servers[math.random(1, #servers)]
-        Visited[chosen.id] = true
-
-        print("Hop:", chosen.id, "| Players:", chosen.playing)
-
-        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, chosen.id, game.Players.LocalPlayer)
-    else
-        warn("Không có server, retry...")
+    -- nếu không tìm được server → reset visited + thử lại
+    if not found then
+        warn("Không tìm được server → reset & thử lại")
+        Visited = {}
         task.wait(2)
         HopServer()
     end
 end
-
 _G.TargetPlayer = nil
 local StartAttackTime, IsReached = 0, false
 local startSession, lastHopTime = os.time(), os.time()
