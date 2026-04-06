@@ -310,27 +310,84 @@ task.spawn(function()
                 end
 
                 if CurrentTween then CurrentTween:Cancel() end
-                -- Teleport thẳng vào target nếu còn xa, tween nếu đã gần
-                if dist > 10 then
-                    hrp.CFrame = thit.CFrame * CFrame.new(0, 7, 0)
-                else
-                    CurrentTween = TweenService:Create(hrp, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {CFrame = thit.CFrame * CFrame.new(0, 7, 0)})
-                    CurrentTween:Play()
-                end
-            else
-                if lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") and lp.Character.HumanoidRootPart:FindFirstChild("BananaFix") then
-                    lp.Character.HumanoidRootPart.BananaFix:Destroy()
-                end
+-- // SERVICES
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
-                if CurrentTween then CurrentTween:Cancel() end
-                StatusL.Text = string.format("Status: Searching... | Hop: %ds", hopCountdown)
-                local players = Players:GetPlayers()
-                _G.TargetPlayer = players[math.random(1, #players)]
-                if _G.TargetPlayer == lp then _G.TargetPlayer = nil end
-                IsReached, StartAttackTime = false, 0
-            end
-        end)
+-- // PLAYER
+local lp = Players.LocalPlayer
+
+-- // SETTINGS
+local TP_DELAY = 0.03
+local TP_REPEAT = 3
+
+-- // GET HRP
+local function GetHRP()
+    local char = lp.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        return char.HumanoidRootPart
+    end
+end
+
+-- // ANTI KÉO NGƯỢC (CHẠY NGẦM)
+task.spawn(function()
+    while true do
+        local hrp = GetHRP()
+        if hrp then
+            hrp.Velocity = Vector3.new(0,0,0)
+            hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+        end
+        task.wait()
     end
 end)
+
+-- // TP BYPASS CORE
+local function TPBypass(targetCF)
+    local hrp = GetHRP()
+    if not hrp then return end
+
+    for i = 1, TP_REPEAT do
+        hrp.Velocity = Vector3.new(0,0,0)
+        hrp.AssemblyLinearVelocity = Vector3.new(0,0,0)
+
+        -- TP + giữ ổn định
+        hrp.CFrame = targetCF
+
+        -- spam nhẹ để tránh server kéo
+        task.wait(TP_DELAY)
+    end
+end
+
+-- // TP SAFE (khuyên dùng)
+local function TPSafe(targetCF)
+    local hrp = GetHRP()
+    if not hrp then return end
+
+    -- TP 2 lần ngay lập tức (bypass mạnh hơn)
+    hrp.CFrame = targetCF
+    task.wait()
+    hrp.CFrame = targetCF
+
+    -- thêm bypass spam
+    TPBypass(targetCF)
+end
+
+-- // TP TO TARGET (TRÊN ĐẦU)
+function TPToTarget(targetHRP)
+    if not targetHRP then return end
+
+    local targetPos = targetHRP.CFrame * CFrame.new(0, 7, 0)
+    TPSafe(targetPos)
+end
+
+-- // EXAMPLE USE:
+-- TPToTarget(enemy.Character.HumanoidRootPart)
+
+-- // RETURN (nếu bạn muốn require)
+return {
+    TPBypass = TPBypass,
+    TPSafe = TPSafe,
+    TPToTarget = TPToTarget
+}
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/duy260414-lang/Fastattack/refs/heads/main/Ultra"))()
